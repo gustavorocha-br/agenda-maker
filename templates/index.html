@@ -4,108 +4,172 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Agendamento de Salas</title>
+    <!-- Adicione o Font Awesome para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f4f4f4;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            background: linear-gradient(120deg, #e0eafc 0%, #cfdef3 100%);
             color: #333;
         }
         .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 90%;
+            margin: 40px auto;
+            background: #fff;
+            padding: 32px 28px 24px 28px;
+            border-radius: 18px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.12);
         }
-        h1, h2 {
-            color: #0056b3;
+        h1 {
+            color: #2563eb;
+            text-align: center;
+            margin-bottom: 18px;
+        }
+        h2 {
+            color: #2563eb;
+            margin-top: 24px;
+            margin-bottom: 12px;
+            font-size: 1.2em;
         }
         form {
-            margin-bottom: 20px;
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            background-color: #f9f9f9;
+            margin-bottom: 18px;
         }
         label {
             display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
+            margin-bottom: 4px;
+            font-weight: 500;
         }
         input[type="text"],
         input[type="email"],
         input[type="password"],
+        input[type="date"],
         select {
-            width: calc(100% - 22px);
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+            width: 100%;
+            padding: 10px 12px;
+            margin-bottom: 14px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 1em;
+            transition: border-color 0.2s;
+            background: #f8fafc;
+        }
+        input:focus, select:focus {
+            border-color: #2563eb;
+            outline: none;
+            background: #e0e7ff;
         }
         button {
-            background-color: #007bff;
-            color: white;
-            padding: 10px 15px;
+            background: #2563eb;
+            color: #fff;
+            padding: 10px 18px;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 1em;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(56,189,248,0.08);
+            transition: background 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
         button:hover {
-            background-color: #0056b3;
+            background: linear-gradient(90deg, #1d4ed8 60%, #0ea5e9 100%);
         }
         .message {
-            margin-top: 15px;
-            padding: 10px;
-            border-radius: 4px;
+            margin-top: 10px;
+            padding: 10px 14px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.98em;
         }
         .message.success {
-            background-color: #d4edda;
-            color: #155724;
-            border-color: #c3e6cb;
+            background: #e0f7e9;
+            color: #15803d;
+            border: 1px solid #bbf7d0;
         }
         .message.error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border-color: #f5c6cb;
+            background: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+        }
+        #welcome-message {
+            font-size: 1.08em;
+            font-weight: 600;
+            color: #22c55e;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+        #toggle-register-link, #register-section p {
+            text-align: center;
+            margin-bottom: 0;
+        }
+        #toggle-register-link a, #register-section a {
+            color: #2563eb;
+            text-decoration: underline;
+            font-weight: 500;
+        }
+        #agenda-section {
+            margin-top: 18px;
         }
         #agendamentos-list {
             list-style: none;
             padding: 0;
         }
         #agendamentos-list li {
-            background-color: #e9ecef;
-            margin-bottom: 10px;
-            padding: 10px;
-            border-radius: 5px;
+            background: #f1f5f9;
+            margin-bottom: 12px;
+            padding: 14px 12px;
+            border-radius: 8px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            box-shadow: 0 1px 4px rgba(37,99,235,0.04);
+            font-size: 0.98em;
         }
         #agendamentos-list li button {
-            background-color: #dc3545;
-            padding: 5px 10px;
-            font-size: 14px;
+            background: #ef4444;
+            color: #fff;
+            padding: 6px 12px;
+            font-size: 0.95em;
+            border-radius: 5px;
+            border: none;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
         #agendamentos-list li button:hover {
-            background-color: #c82333;
+            background: #b91c1c;
         }
-        #welcome-message {
-            font-size: 1.1em;
-            font-weight: bold;
-            color: #28a745;
-            margin-bottom: 15px;
+        #logout-button {
+            margin-top: 18px;
+            width: 100%;
+            background: #64748b;
+        }
+        #logout-button:hover {
+            background: #334155;
         }
         .hidden {
             display: none;
+        }
+        @media (max-width: 600px) {
+            .container {
+                max-width: 98vw;
+                padding: 16px 4vw 12px 4vw;
+            }
+            h1 {
+                font-size: 1.2em;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Sistema de Agendamento da Sala Maker</h1>
+        <h1><i class="fa-solid fa-calendar-check"></i> Sistema de Agendamento da Sala Maker</h1>
 
         <p id="welcome-message" class="hidden"></p>
 
@@ -118,7 +182,7 @@
                 <label for="login-senha">Senha:</label>
                 <input type="password" id="login-senha" name="senha" required>
 
-                <button type="submit">Entrar</button>
+                <button type="submit"><i class="fa-solid fa-right-to-bracket"></i> Entrar</button>
             </form>
             <div id="login-message" class="message hidden"></div>
         </div>
@@ -135,7 +199,7 @@
                 <label for="prof-senha">Senha:</label>
                 <input type="password" id="prof-senha" name="prof-senha" required>
 
-                <button type="submit">Cadastrar</button>
+                <button type="submit"><i class="fa-solid fa-user-plus"></i> Cadastrar</button>
             </form>
             <div id="register-message" class="message hidden"></div>
             <p>Já tem uma conta? <a href="#" id="show-login">Faça login aqui</a>.</p>
@@ -158,7 +222,7 @@
                     <option value="13:30 - 15:00">13:30 - 15:00</option>
                     <option value="15:00 - 17:00">15:00 - 17:00</option>
                 </select>
-                <button type="submit">Agendar</button>
+                <button type="submit"><i class="fa-solid fa-calendar-plus"></i> Agendar</button>
             </form>
             <div id="agenda-message" class="message hidden"></div>
 
@@ -167,7 +231,7 @@
                 </ul>
             <div id="list-agendamentos-message" class="message hidden"></div>
             
-            <button id="logout-button">Sair</button>
+            <button id="logout-button"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sair</button>
         </div>
     </div>
 
@@ -221,8 +285,8 @@
                         data.agendamentos.forEach(agendamento => {
                             const li = document.createElement('li');
                             li.innerHTML = `
-                                <span>${agendamento.dia} - ${agendamento.hora_inicio.substring(11,16)} às ${agendamento.hora_termino.substring(11,16)} (${agendamento.horario_tipo})</span>
-                                <button data-id="${agendamento.id}">Cancelar</button>
+                                <span><i class="fa-solid fa-clock"></i> ${agendamento.dia} - ${agendamento.hora_inicio.substring(11,16)} às ${agendamento.hora_termino.substring(11,16)} (${agendamento.horario_tipo})</span>
+                                <button data-id="${agendamento.id}"><i class="fa-solid fa-trash"></i> Cancelar</button>
                             `;
                             agendamentosList.appendChild(li);
                         });
