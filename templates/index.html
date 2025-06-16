@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Agendamento de Salas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #0056b3;
+        }
+        form {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        select {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .message {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border-color: #c3e6cb;
+        }
+        .message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
+        #agendamentos-list {
+            list-style: none;
+            padding: 0;
+        }
+        #agendamentos-list li {
+            background-color: #e9ecef;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #agendamentos-list li button {
+            background-color: #dc3545;
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+        #agendamentos-list li button:hover {
+            background-color: #c82333;
+        }
+        #welcome-message {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #28a745;
+            margin-bottom: 15px;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Sistema de Agendamento da Sala Maker</h1>
+
+        <p id="welcome-message" class="hidden"></p>
+
+        <div id="login-section">
+            <h2>Login de Professor</h2>
+            <form id="login-form">
+                <label for="login-email">E-mail:</label>
+                <input type="email" id="login-email" name="email" required>
+
+                <label for="login-senha">Senha:</label>
+                <input type="password" id="login-senha" name="senha" required>
+
+                <button type="submit">Entrar</button>
+            </form>
+            <div id="login-message" class="message hidden"></div>
+        </div>
+
+        <div id="register-section" class="hidden">
+            <h2>Cadastrar Novo Professor</h2>
+            <form id="register-form">
+                <label for="prof-nome">Nome Completo:</label>
+                <input type="text" id="prof-nome" name="prof-nome" required>
+
+                <label for="prof-email">E-mail:</label>
+                <input type="email" id="prof-email" name="prof-email" required>
+
+                <label for="prof-senha">Senha:</label>
+                <input type="password" id="prof-senha" name="prof-senha" required>
+
+                <button type="submit">Cadastrar</button>
+            </form>
+            <div id="register-message" class="message hidden"></div>
+            <p>Já tem uma conta? <a href="#" id="show-login">Faça login aqui</a>.</p>
+        </div>
+        
+        <p id="toggle-register-link">Não tem uma conta? <a href="#" id="show-register">Cadastre-se aqui</a>.</p>
+
+        <hr>
+
+        <div id="agenda-section" class="hidden">
+            <h2>Agendar Sala</h2>
+            <form id="agenda-form">
+                <label for="agenda-dia" class="block mb-2 font-bold">Selecione o Dia:</label>
+                <input type="date" id="agenda-dia" name="dia" required class="w-full p-2 mb-3 border border-gray-300 rounded-md">
+                <label for="opcao-agendamento">Selecione o Horário:</label>
+                <select id="opcao-agendamento" name="opcao-agendamento" required>
+                    <option value="">-- Selecione um horário --</option>
+                    <option value="08:00 - 10:00">08:00 - 10:00</option>
+                    <option value="10:00 - 12:00">10:00 - 12:00</option>
+                    <option value="13:30 - 15:00">13:30 - 15:00</option>
+                    <option value="15:00 - 17:00">15:00 - 17:00</option>
+                </select>
+                <button type="submit">Agendar</button>
+            </form>
+            <div id="agenda-message" class="message hidden"></div>
+
+            <h2>Meus Agendamentos</h2>
+            <ul id="agendamentos-list">
+                </ul>
+            <div id="list-agendamentos-message" class="message hidden"></div>
+            
+            <button id="logout-button">Sair</button>
+        </div>
+    </div>
+
+    <script>
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const agendaForm = document.getElementById('agenda-form');
+        const logoutButton = document.getElementById('logout-button');
+
+        const loginMessage = document.getElementById('login-message');
+        const registerMessage = document.getElementById('register-message');
+        const agendaMessage = document.getElementById('agenda-message');
+        const listAgendamentosMessage = document.getElementById('list-agendamentos-message');
+
+        const loginSection = document.getElementById('login-section');
+        const registerSection = document.getElementById('register-section');
+        const agendaSection = document.getElementById('agenda-section');
+        const agendamentosList = document.getElementById('agendamentos-list');
+        const welcomeMessage = document.getElementById('welcome-message');
+        const toggleRegisterLink = document.getElementById('toggle-register-link');
+        const showLoginLink = document.getElementById('show-login');
+        const showRegisterLink = document.getElementById('show-register');
+
+        // --- Funções de Utilitário ---
+        function showMessage(element, type, text) {
+            element.textContent = text;
+            element.className = `message ${type}`;
+            element.classList.remove('hidden');
+            setTimeout(() => {
+                element.classList.add('hidden');
+            }, 5000); // Esconde a mensagem após 5 segundos
+        }
+
+        function toggleSections(showLogin, showRegister, showAgenda) {
+            loginSection.classList.toggle('hidden', !showLogin);
+            registerSection.classList.toggle('hidden', !showRegister);
+            agendaSection.classList.toggle('hidden', !showAgenda);
+            toggleRegisterLink.classList.toggle('hidden', !showLogin); // Esconde o link de "não tem conta" se estiver logado ou cadastrando
+        }
+
+        async function fetchAgendamentos() {
+            agendamentosList.innerHTML = ''; // Limpa a lista antes de carregar
+            try {
+                const response = await fetch('/api/agendamentos-professor');
+                const data = await response.json();
+
+                if (data.msg === 'success') {
+                    if (data.agendamentos.length === 0) {
+                        agendamentosList.innerHTML = '<li>Nenhum agendamento encontrado.</li>';
+                    } else {
+                        data.agendamentos.forEach(agendamento => {
+                            const li = document.createElement('li');
+                            li.innerHTML = `
+                                <span>${agendamento.dia} - ${agendamento.hora_inicio.substring(11,16)} às ${agendamento.hora_termino.substring(11,16)} (${agendamento.horario_tipo})</span>
+                                <button data-id="${agendamento.id}">Cancelar</button>
+                            `;
+                            agendamentosList.appendChild(li);
+                        });
+                        // Adiciona listeners para os botões de cancelar
+                        document.querySelectorAll('#agendamentos-list button').forEach(button => {
+                            button.addEventListener('click', cancelAgendamento);
+                        });
+                    }
+                } else {
+                    showMessage(listAgendamentosMessage, 'error', data.details || 'Erro ao carregar agendamentos.');
+                }
+            } catch (error) {
+                console.error('Erro ao buscar agendamentos:', error);
+                showMessage(listAgendamentosMessage, 'error', 'Erro de conexão ao carregar agendamentos.');
+            }
+        }
+
+        async function checkLoginStatus() {
+            // Em uma aplicação real, você faria uma requisição para uma rota /api/status-login
+            // que verificaria a sessão no backend e retornaria o status e dados do usuário.
+            // Para simplificar, estamos simulando aqui.
+            try {
+                const response = await fetch('/api/check-login'); // Você precisaria criar essa rota no Flask
+                const data = await response.json();
+
+                if (data.logged_in) {
+                    welcomeMessage.textContent = `Bem-vindo(a), ${data.prof_nome}!`;
+                    welcomeMessage.classList.remove('hidden');
+                    toggleSections(false, false, true); // Esconde login/cadastro, mostra agendamento
+                    fetchAgendamentos();
+                } else {
+                    welcomeMessage.classList.add('hidden');
+                    toggleSections(true, false, false); // Mostra login, esconde cadastro/agendamento
+                }
+            } catch (error) {
+                console.error('Erro ao verificar status de login:', error);
+                welcomeMessage.classList.add('hidden');
+                toggleSections(true, false, false); // Assume que não está logado em caso de erro
+            }
+        }
+
+        // --- Event Listeners ---
+        showRegisterLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            toggleSections(false, true, false);
+        });
+
+        showLoginLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            toggleSections(true, false, false);
+        });
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(loginForm);
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                if (response.status === 401) {
+                    showMessage(loginMessage, 'error', 'Credenciais inválidas. Verifique seu e-mail e senha.');
+                } else if (data[0].msg === 'success') {
+                    showMessage(loginMessage, 'success', data[0].details);
+                    loginForm.reset();
+                    welcomeMessage.textContent = `Bem-vindo(a), ${data[0].professor.nome}!`;
+                    welcomeMessage.classList.remove('hidden');
+                    toggleSections(false, false, true); // Esconde login/cadastro, mostra agendamento
+                    fetchAgendamentos();
+                } else {
+                    showMessage(loginMessage, 'error', data[0].details);
+                }
+            } catch (error) {
+                console.error('Erro no login:', error);
+                showMessage(loginMessage, 'error', 'Erro de conexão ao tentar fazer login.');
+            }
+        });
+
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(registerForm);
+            try {
+                const response = await fetch('/api/cadastra-professor', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                if (data.msg === 'success') {
+                    showMessage(registerMessage, 'success', data.details);
+                    registerForm.reset();
+                    // Opcional: após o cadastro, pode-se redirecionar para o login
+                    toggleSections(true, false, false);
+                    showMessage(loginMessage, 'success', 'Cadastro realizado com sucesso! Faça login.');
+                } else {
+                    showMessage(registerMessage, 'error', data.details);
+                }
+            } catch (error) {
+                console.error('Erro no cadastro:', error);
+                showMessage(registerMessage, 'error', 'Erro de conexão ao tentar cadastrar.');
+            }
+        });
+
+        agendaForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(agendaForm);
+            try {
+                const response = await fetch('/api/agenda-sala', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                if (data.msg === 'success') {
+                    showMessage(agendaMessage, 'success', data.details);
+                    agendaForm.reset();
+                    fetchAgendamentos(); // Atualiza a lista de agendamentos
+                } else {
+                    showMessage(agendaMessage, 'error', data.details);
+                }
+            } catch (error) {
+                console.error('Erro no agendamento:', error);
+                showMessage(agendaMessage, 'error', 'Erro de conexão ao tentar agendar.');
+            }
+        });
+
+        logoutButton.addEventListener('click', async () => {
+            try {
+                const response = await fetch('/api/logout', {
+                    method: 'POST'
+                });
+                const data = await response.json();
+                if (data.msg === 'success') {
+                    showMessage(loginMessage, 'success', data.details);
+                    welcomeMessage.classList.add('hidden');
+                    agendamentosList.innerHTML = ''; // Limpa a lista
+                    toggleSections(true, false, false); // Volta para a tela de login
+                } else {
+                    showMessage(loginMessage, 'error', data.details); // Mesmo que seja logout, mostra mensagem no login
+                }
+            } catch (error) {
+                console.error('Erro no logout:', error);
+                showMessage(loginMessage, 'error', 'Erro de conexão ao tentar fazer logout.');
+            }
+        });
+
+        async function cancelAgendamento(e) {
+            const agendamentoId = e.target.dataset.id;
+            if (!confirm('Tem certeza que deseja cancelar este agendamento?')) {
+                return;
+            }
+            try {
+                const response = await fetch(`/api/cancelar-agendamento/${agendamentoId}`, {
+                    method: 'DELETE'
+                });
+                const data = await response.json();
+                if (data.msg === 'success') {
+                    showMessage(listAgendamentosMessage, 'success', data.details);
+                    fetchAgendamentos(); // Atualiza a lista
+                } else {
+                    showMessage(listAgendamentosMessage, 'error', data.details);
+                }
+            } catch (error) {
+                console.error('Erro ao cancelar agendamento:', error);
+                showMessage(listAgendamentosMessage, 'error', 'Erro de conexão ao tentar cancelar agendamento.');
+            }
+        }
+
+        // Inicializa a verificação de status de login ao carregar a página
+        document.addEventListener('DOMContentLoaded', checkLoginStatus);
+
+    </script>
+</body>
+</html>
